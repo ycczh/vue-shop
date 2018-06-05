@@ -15,9 +15,9 @@
                     <div class="filter stopPop" id="filter">
                         <dl class="filter-price">
                         <dt>Price:</dt>
-                        <dd><a href="javascript:void(0)" :class="{'cur':priceChecked=='all'}" @click="priceChecked='all'">All</a></dd>
+                        <dd><a href="javascript:void(0)" :class="{'cur':priceChecked=='all'}" @click="filter('all')">All</a></dd>
                         <dd v-for="(item,index) in price" :key="index">
-                            <a href="javascript:void(0)" @click="priceChecked=index" :class="{'cur':priceChecked==index}">{{item.startprice}} - {{item.endprice}}</a>
+                            <a href="javascript:void(0)" @click="filter(index)" :class="{'cur':priceChecked==index}">{{item.startprice}} - {{item.endprice}}</a>
                         </dd>
                         
                         </dl>
@@ -100,7 +100,7 @@ export default {
     },
     methods:{
         getGoodlist(){
-            axios.get('http://127.0.0.1:3000/goods/list?page=1&pageSize=5&priceLevel=1&sort=1').then((result)=>{
+            axios.get('http://127.0.0.1:3000/goods/list?page=1&pageSize=10&priceLevel=all&sort=1').then((result)=>{
                 var res=result.data;
                 this.goodslist=res.result.list;
                 
@@ -119,6 +119,23 @@ export default {
          closeModal(){
           this.mdShow = false;
           this.mdShowCart = false;
+        },
+        filter(target){
+          this.priceChecked=target;
+          axios.get('http://127.0.0.1:3000/goods/list',{
+            params:{
+              "page":"1",
+              "pageSize":"10",
+              "sort":"1",
+              "priceLevel":target
+            }
+          }).then((response)=>{
+              var res=response.data;
+              if(res.status==0){
+                  this.goodslist=res.result.list;
+              }
+
+          })
         }
     },
     mounted(){
